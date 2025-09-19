@@ -28,7 +28,7 @@ export default function Home() {
     <main className="bg-[url('/images/bg-main.svg')] bg-cover">
       <NavBar />
       <section className="main-section">
-        <div className="page-heading">
+        <div className="page-heading py-16">
           <h1> Upload your resume and get instant feedback!</h1>
           <h2> Review seperate feeback for each file upload, and modify accordingly!! </h2>
         </div>
