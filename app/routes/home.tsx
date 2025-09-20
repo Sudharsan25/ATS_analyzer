@@ -8,8 +8,8 @@ import { Link, useNavigate } from 'react-router';
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Resumind" },
-    { name: "description", content: "Smart feedback for your dream job!" },
+    { title: "ATS Resume analyzer" },
+    { name: "description", content: "Get instant feedback on your resume and ATS scores related to the job description!!" },
   ];
 }
 
