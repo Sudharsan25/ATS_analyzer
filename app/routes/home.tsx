@@ -1,46 +1,78 @@
 import NavBar from "~/components/NavBar";
 import type { Route } from "./+types/home";
 import ResumeCard from "~/components/ResumeCard";
-// Update the import path to the correct location where 'resumes' is exported
-import { resumes } from "../../constants"
 import { usePuterStore } from 'lib/puter'
-import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "ATS Resume Analyzer" },
-    { name: "description", content: "Analyze your resumes and get ATS score!" },
+    { title: "Resumind" },
+    { name: "description", content: "Smart feedback for your dream job!" },
   ];
 }
 
 export default function Home() {
-
-  const {isLoading, error, auth } = usePuterStore((state) => state);
-
+  const { auth, kv } = usePuterStore();
   const navigate = useNavigate();
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [loadingResumes, setLoadingResumes] = useState(false);
 
   useEffect(() => {
     if(!auth.isAuthenticated) navigate('/auth?next=/');
-  }, [auth.isAuthenticated]);
+  }, [auth.isAuthenticated])
 
-  return (
-    <main className="bg-[url('/images/bg-main.svg')] bg-cover">
-      <NavBar />
-      <section className="main-section">
-        <div className="page-heading py-16">
-          <h1> Upload your resume and get instant feedback!</h1>
-          <h2> Review seperate feeback for each file upload, and modify accordingly!! </h2>
-        </div>
-      
-        {resumes.length > 0 && (
-          <div className="resumes-section">
-            {resumes.map((resume) => (
-              <ResumeCard key={resume.id} resume={resume}/>
-            ))}
-          </div>
+  useEffect(() => {
+    const loadResumes = async () => {
+      setLoadingResumes(true);
+
+      const resumes = (await kv.list('resume:*', true)) as KVItem[];
+
+      const parsedResumes = resumes?.map((resume) => (
+          JSON.parse(resume.value) as Resume
+      ))
+
+      setResumes(parsedResumes || []);
+      setLoadingResumes(false);
+    }
+
+    loadResumes()
+  }, []);
+
+  return <main className="bg-[url('/images/bg-main.svg')] bg-cover">
+    <NavBar />
+
+    <section className="main-section">
+      <div className="page-heading py-16">
+        <h1>Track Your Applications & Resume Ratings</h1>
+        {!loadingResumes && resumes?.length === 0 ? (
+            <h2>No resumes found. Upload your first resume to get feedback.</h2>
+        ): (
+          <h2>Review your submissions and check AI-powered feedback.</h2>
         )}
-      </section>
-    </main>
-  );
+      </div>
+      {loadingResumes && (
+          <div className="flex flex-col items-center justify-center">
+            <img src="/images/resume-scan-2.gif" className="w-[200px]" />
+          </div>
+      )}
+
+      {!loadingResumes && resumes.length > 0 && (
+        <div className="resumes-section">
+          {resumes.map((resume) => (
+              <ResumeCard key={resume.id} resume={resume} />
+          ))}
+        </div>
+      )}
+
+      {!loadingResumes && resumes?.length === 0 && (
+          <div className="flex flex-col items-center justify-center mt-10 gap-4">
+            <Link to="/upload" className="primary-button w-fit text-xl font-semibold">
+              Upload Resume
+            </Link>
+          </div>
+      )}
+    </section>
+  </main>
 }
