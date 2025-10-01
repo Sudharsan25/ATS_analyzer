@@ -5,13 +5,12 @@ import { useLocation, useNavigate } from 'react-router';
 export const meta = () => ([
     {title: "ATS Resume Analyzer | Auth "},
     {name:"ATS Resume Analyzer ", content: "Log into your ATS account!"}
-])  
- 
+]);
 
 
 const Auth = () => {
 
-  const {isLoading, error, auth } = usePuterStore((state) => state);
+  const {isLoading, auth } = usePuterStore((state) => state);
   const location = useLocation();
   const next = location.search.split("next=")[1];
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ const Auth = () => {
   useEffect(() => {
     if(auth.isAuthenticated) navigate(next);
   }, [auth.isAuthenticated, next]);
-  
+
   return (
      <main className="bg-[url('/images/bg-main.svg')] bg-cover flex items-center justify-center">
         <div className='gradient-border shadow-lg'>

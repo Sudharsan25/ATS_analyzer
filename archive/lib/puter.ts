@@ -363,6 +363,8 @@ export const usePuterStore = create<PuterStore>((set, get) => {
         return puter.ai.img2txt(image, testMode);
     };
 
+
+    // change all key kv related options to MongoDB and FastAPI
     const getKV = async (key: string) => {
         const puter = getPuter();
         if (!puter) {

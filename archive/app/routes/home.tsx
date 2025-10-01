@@ -27,6 +27,7 @@ export default function Home() {
     const loadResumes = async () => {
       setLoadingResumes(true);
 
+      // get data from MongoDB using fastAPI
       const resumes = (await kv.list('resume:*', true)) as KVItem[];
 
       const parsedResumes = resumes?.map((resume) => (

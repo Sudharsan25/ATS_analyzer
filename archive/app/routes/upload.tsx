@@ -1,4 +1,4 @@
-import {type FormEvent, useState} from 'react'
+import {type FormEvent, useEffect, useState} from 'react'
 
 import FileUploader from "~/components/FileUploader";
 
@@ -18,9 +18,14 @@ const Upload = () => {
     const [statusText, setStatusText] = useState('');
     const [file, setFile] = useState<File | null>(null);
 
+    useEffect(() => {
+        if(!auth.isAuthenticated) navigate('/auth?next=/upload');
+      }, [auth.isAuthenticated])
+
     const handleFileSelect = (file: File | null) => {
         setFile(file)
     }
+
 
     const handleAnalyze = async ({ companyName, jobTitle, jobDescription, file }: { companyName: string, jobTitle: string, jobDescription: string, file: File  }) => {
         setIsProcessing(true);
@@ -46,6 +51,8 @@ const Upload = () => {
             companyName, jobTitle, jobDescription,
             feedback: '',
         }
+
+        // store data in mongoDB using fastAPI
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
 
         setStatusText('Analyzing...');
@@ -61,6 +68,7 @@ const Upload = () => {
             : feedback.message.content[0].text;
 
         data.feedback = JSON.parse(feedbackText);
+        // store data in mongoDB using fastAPI
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
         setStatusText('Analysis complete, redirecting...');
         console.log(data);

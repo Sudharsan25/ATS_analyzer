@@ -20,10 +20,11 @@ const Resume = () => {
 
     useEffect(() => {
         if(!isLoading && !auth.isAuthenticated) navigate(`/auth?next=/resume/${id}`);
-    }, [isLoading])
+    }, [isLoading]);
 
     useEffect(() => {
         const loadResume = async () => {
+            // get single resume from MongoDB using FastAPI
             const resume = await kv.get(`resume:${id}`);
 
             if(!resume) return;
